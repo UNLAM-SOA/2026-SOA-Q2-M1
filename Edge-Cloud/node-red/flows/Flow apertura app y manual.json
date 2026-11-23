@@ -1,0 +1,323 @@
+[
+    {
+        "id": "d6556849d0225941",
+        "type": "tab",
+        "label": "Flow Apertura",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "1b4af602bab4ce26",
+        "type": "http in",
+        "z": "d6556849d0225941",
+        "name": "API Apertura gimnasio/puerta/apertura/",
+        "url": "gimnasio/puerta/apertura/",
+        "method": "get",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 370,
+        "y": 280,
+        "wires": [
+            [
+                "1a9e196024dfbcd3"
+            ]
+        ]
+    },
+    {
+        "id": "28eb9bd3ebc3c4a5",
+        "type": "http response",
+        "z": "d6556849d0225941",
+        "name": "RESPONSE Datos inválidos",
+        "statusCode": "",
+        "headers": {},
+        "x": 960,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "1a9e196024dfbcd3",
+        "type": "function",
+        "z": "d6556849d0225941",
+        "name": "Validador DNI ESP32",
+        "func": "const {dni} = msg.req.query;\n\nif (!/^\\d{7,8}$/.test(dni) || dni.length < 7) {\n    msg.statusCode = 400;\n    msg.payload = { error: \"Datos inválidos\" };\n    return [null, msg];\n}\n\nmsg.dni = dni;\nreturn [msg, null];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 280,
+        "wires": [
+            [
+                "005a3b513e336a72"
+            ],
+            [
+                "28eb9bd3ebc3c4a5"
+            ]
+        ]
+    },
+    {
+        "id": "005a3b513e336a72",
+        "type": "sqlstring-format",
+        "z": "d6556849d0225941",
+        "name": "query datos user",
+        "query": "SELECT nombre, password_hash, activo\nFROM usuarios\nWHERE dni = ?;",
+        "vars": "dni",
+        "outField": "query",
+        "x": 910,
+        "y": 260,
+        "wires": [
+            [
+                "db373e1d487e8183"
+            ]
+        ]
+    },
+    {
+        "id": "db373e1d487e8183",
+        "type": "postgresql",
+        "z": "d6556849d0225941",
+        "name": "",
+        "query": "",
+        "postgreSQLConfig": "7886bb95aa94cc66",
+        "split": false,
+        "rowsPerMsg": 1,
+        "outputs": 1,
+        "x": 1110,
+        "y": 260,
+        "wires": [
+            [
+                "846c7f0e04b752cb",
+                "65cc2a291d62ce9b"
+            ]
+        ]
+    },
+    {
+        "id": "846c7f0e04b752cb",
+        "type": "function",
+        "z": "d6556849d0225941",
+        "name": "Armar respuesta",
+        "func": "const bcrypt = global.get('bcrypt');\nconst user = msg.payload[0];\n\nif (!user) {\n    msg.statusCode = 401;\n    msg.payload = { error: \"Credenciales incorrectas\" };\n    return msg;\n}\n\nif (!user.activo) {\n    msg.statusCode = 403;\n    msg.payload = { error: \"Usuario no activo\" };\n    return msg;\n}\n\nmsg.statusCode = 200;\nmsg.payload = { ok: true, nombre: user.nombre, estado: user.activo };\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1340,
+        "y": 260,
+        "wires": [
+            [
+                "07a8483a96f2eaa7",
+                "162b945ddfc4e063"
+            ]
+        ]
+    },
+    {
+        "id": "65cc2a291d62ce9b",
+        "type": "debug",
+        "z": "d6556849d0225941",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1340,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "07a8483a96f2eaa7",
+        "type": "http response",
+        "z": "d6556849d0225941",
+        "name": "RESPONSE Apertura manual",
+        "statusCode": "",
+        "headers": {},
+        "x": 1590,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "162b945ddfc4e063",
+        "type": "debug",
+        "z": "d6556849d0225941",
+        "name": "debug 5",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1520,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "eb7631dc7acc7a92",
+        "type": "mqtt in",
+        "z": "d6556849d0225941",
+        "name": "",
+        "topic": "gimnasio/puerta/notificarApertura",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "7b151c7d37897a23",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 350,
+        "y": 840,
+        "wires": [
+            [
+                "a4c16f5c98e7c755"
+            ]
+        ]
+    },
+    {
+        "id": "a4c16f5c98e7c755",
+        "type": "function",
+        "z": "d6556849d0225941",
+        "name": "Contador de personas en gimnasio",
+        "func": "const {cantidad} = msg.payload;\nconst nombreContadorPersonas = \"contador_personas\";\n\nif (!global.get(nombreContadorPersonas)) {\n    global.set(nombreContadorPersonas, 0);\n}\n\nif (global.get(nombreContadorPersonas) == 0 && cantidad < 1) {\n    msg.payload = {\n        cantidadPersonasActual: 0\n    }\n\n    return msg;\n}\n\nglobal.set(nombreContadorPersonas, global.get(nombreContadorPersonas) + cantidad);\n\nmsg.payload = {\n    cantidadPersonasActual: global.get(nombreContadorPersonas)\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 760,
+        "wires": [
+            [
+                "7812eb68d16cf443",
+                "4cedd67ec28d44b0"
+            ]
+        ]
+    },
+    {
+        "id": "7812eb68d16cf443",
+        "type": "mqtt out",
+        "z": "d6556849d0225941",
+        "name": "",
+        "topic": "gimnasio/cantidadPersonas",
+        "qos": "1",
+        "retain": "true",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "7b151c7d37897a23",
+        "x": 1160,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "4cedd67ec28d44b0",
+        "type": "debug",
+        "z": "d6556849d0225941",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "86f2910ce091e8e3",
+        "type": "mqtt in",
+        "z": "d6556849d0225941",
+        "name": "",
+        "topic": "gimnasio/puerta/notificarSalida",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "7b151c7d37897a23",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 350,
+        "y": 700,
+        "wires": [
+            [
+                "a4c16f5c98e7c755"
+            ]
+        ]
+    },
+    {
+        "id": "7886bb95aa94cc66",
+        "type": "postgreSQLConfig",
+        "name": "BBDD Gym",
+        "host": "127.0.0.1",
+        "hostFieldType": "str",
+        "port": "5433",
+        "portFieldType": "num",
+        "database": "soa_gym",
+        "databaseFieldType": "str",
+        "ssl": "false",
+        "sslFieldType": "bool",
+        "applicationName": "",
+        "applicationNameType": "str",
+        "max": 10,
+        "maxFieldType": "num",
+        "idle": 1000,
+        "idleFieldType": "num",
+        "connectionTimeout": 10000,
+        "connectionTimeoutFieldType": "num",
+        "userFieldType": "cred",
+        "userEnv": "",
+        "passwordFieldType": "cred",
+        "passwordEnv": ""
+    },
+    {
+        "id": "7b151c7d37897a23",
+        "type": "mqtt-broker",
+        "name": "mosquitto-broker",
+        "broker": "127.0.0.1",
+        "port": 1883,
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "5c8b9d0f7e9e4684",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-sqlstring": "0.1.1",
+            "node-red-contrib-postgresql": "0.16.2"
+        }
+    }
+]

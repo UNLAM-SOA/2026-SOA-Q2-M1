@@ -1,0 +1,145 @@
+[
+    {
+        "id": "43c0f7151383508b",
+        "type": "tab",
+        "label": "DDBB Creation",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "f5e1627711567b29",
+        "type": "postgresql",
+        "z": "43c0f7151383508b",
+        "name": "",
+        "query": "",
+        "postgreSQLConfig": "7886bb95aa94cc66",
+        "split": false,
+        "rowsPerMsg": 1,
+        "outputs": 1,
+        "x": 850,
+        "y": 220,
+        "wires": [
+            [
+                "4f1d281f215d4e83"
+            ]
+        ]
+    },
+    {
+        "id": "0a5fce3cc5eec325",
+        "type": "inject",
+        "z": "43c0f7151383508b",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 220,
+        "wires": [
+            [
+                "84d49ea5ef8cfc05"
+            ]
+        ]
+    },
+    {
+        "id": "84d49ea5ef8cfc05",
+        "type": "function",
+        "z": "43c0f7151383508b",
+        "name": "Armar query para tablas y datos de pruebas",
+        "func": "msg.query = `\n    CREATE TABLE IF NOT EXISTS usuarios(\n        id SERIAL PRIMARY KEY,\n        dni VARCHAR(8) UNIQUE NOT NULL, \n        nombre VARCHAR(100), \n        password_hash VARCHAR(100) NOT NULL,\n        activo BOOLEAN NOT NULL DEFAULT TRUE\n    );\n\n    CREATE TABLE IF NOT EXISTS eventos_puerta(\n        id SERIAL PRIMARY KEY, \n        usuario_id INT REFERENCES usuarios(id),\n        tipo VARCHAR(30) NOT NULL,\n        fecha TIMESTAMPTZ NOT NULL DEFAULT NOW()\n    );\n\n    CREATE EXTENSION IF NOT EXISTS pgcrypto;\n    INSERT INTO usuarios(dni, nombre, password_hash)\n    VALUES('40123456', 'Usuario Prueba',\n        crypt('40123456' || '40123456', gen_salt('bf')))\n    ON CONFLICT(dni) DO NOTHING;\n\n    INSERT INTO usuarios(dni, nombre, password_hash)\n    VALUES('1234567', 'Usuario Prueba 2',\n        crypt('1234567' || '1234567', gen_salt('bf')))\n    ON CONFLICT(dni) DO NOTHING;\n`;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 220,
+        "wires": [
+            [
+                "f5e1627711567b29",
+                "dd28386de9988ea5"
+            ]
+        ]
+    },
+    {
+        "id": "4f1d281f215d4e83",
+        "type": "debug",
+        "z": "43c0f7151383508b",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1060,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "dd28386de9988ea5",
+        "type": "debug",
+        "z": "43c0f7151383508b",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 780,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "7886bb95aa94cc66",
+        "type": "postgreSQLConfig",
+        "name": "BBDD Gym",
+        "host": "127.0.0.1",
+        "hostFieldType": "str",
+        "port": "5433",
+        "portFieldType": "num",
+        "database": "soa_gym",
+        "databaseFieldType": "str",
+        "ssl": "false",
+        "sslFieldType": "bool",
+        "applicationName": "",
+        "applicationNameType": "str",
+        "max": 10,
+        "maxFieldType": "num",
+        "idle": 1000,
+        "idleFieldType": "num",
+        "connectionTimeout": 10000,
+        "connectionTimeoutFieldType": "num",
+        "userFieldType": "cred",
+        "userEnv": "",
+        "passwordFieldType": "cred",
+        "passwordEnv": ""
+    },
+    {
+        "id": "d16e53eae6ecbd4a",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-postgresql": "0.16.2"
+        }
+    }
+]

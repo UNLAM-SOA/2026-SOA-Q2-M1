@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Permisos de MQTT -->
+    <uses-permission android:name="android.permission.INTERNET" />              <!-- conectarse a internet (broker MQTT) -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />  <!-- saber si hay conexión -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />             <!-- mantener el servicio MQTT despierto -->
+
+    <!-- Permisos para la geocerca -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />       <!-- ubicación precisa (GPS): sin esto la geocerca no se registra -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />     <!-- ubicación aproximada: Android 12+ la exige junto a la precisa -->
+    <!-- exigencia de android 10 en adelante -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" /> <!-- ubicación con la app cerrada: obligatorio para que la geocerca dispare -->
+
+    <application
+        android:name=".GymApp"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_gympro"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_gympro"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.LogginGym">
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".RegistroActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ActividadMenu"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".CantidadPersonasGym"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+
+        <service android:name="info.mqtt.android.service.MqttService" />
+
+        <!-- Recibe los avisos de entrada/salida de la geocerca; solo Android puede llamarlo -->
+        <receiver
+            android:name=".GeofenceReceiver"
+            android:exported="false" />
+
+        <activity
+            android:name=".AperturaPuerta"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+    </application>
+
+</manifest>

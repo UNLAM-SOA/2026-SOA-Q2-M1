@@ -1,0 +1,265 @@
+[
+    {
+        "id": "f931bcdef6cf04d3",
+        "type": "tab",
+        "label": "Flow User Register",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "a36c2e52763683e0",
+        "type": "http in",
+        "z": "f931bcdef6cf04d3",
+        "name": "API POST /registrar",
+        "url": "/registrar",
+        "method": "post",
+        "upload": true,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 270,
+        "y": 240,
+        "wires": [
+            [
+                "0f6781af4c67fbce"
+            ]
+        ]
+    },
+    {
+        "id": "0f6781af4c67fbce",
+        "type": "function",
+        "z": "f931bcdef6cf04d3",
+        "name": "Validador Datos",
+        "func": "const { dni, clave, nombre, apellido } = msg.payload;\n\nif (!/^\\d{7,8}$/.test(dni) || typeof clave !== \"string\" || clave.length > 100\n        || typeof nombre !== \"string\" || typeof apellido !== \"string\" ) {\n    msg.statusCode = 400;\n    msg.payload = { error: \"Datos inválidos\" };\n    return [null, msg];\n}\n\nmsg.dni = dni;\nmsg.clave = clave;\nmsg.nombre = nombre + \" \" + apellido;\n\nreturn [msg, null];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 240,
+        "wires": [
+            [
+                "aeb20f11a3f15d6a"
+            ],
+            [
+                "ca9ad258b679eb0f"
+            ]
+        ]
+    },
+    {
+        "id": "ca9ad258b679eb0f",
+        "type": "http response",
+        "z": "f931bcdef6cf04d3",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 750,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "aeb20f11a3f15d6a",
+        "type": "sqlstring-format",
+        "z": "f931bcdef6cf04d3",
+        "name": "query dni existente",
+        "query": "SELECT COUNT(dni)\nFROM usuarios\nWHERE dni = ?;",
+        "vars": "dni",
+        "outField": "query",
+        "x": 750,
+        "y": 180,
+        "wires": [
+            [
+                "5bfc1c221277a56b"
+            ]
+        ]
+    },
+    {
+        "id": "5bfc1c221277a56b",
+        "type": "postgresql",
+        "z": "f931bcdef6cf04d3",
+        "name": "",
+        "query": "",
+        "postgreSQLConfig": "7886bb95aa94cc66",
+        "split": false,
+        "rowsPerMsg": 1,
+        "outputs": 1,
+        "x": 950,
+        "y": 240,
+        "wires": [
+            [
+                "3eec0aa4c534e697",
+                "5caee5f2366f9349"
+            ]
+        ]
+    },
+    {
+        "id": "3eec0aa4c534e697",
+        "type": "function",
+        "z": "f931bcdef6cf04d3",
+        "name": "Verificador usuario existente",
+        "func": "const fila = msg.payload[0];\nconst existe = Number(fila.count) > 0;\n\nif (existe) {\n    msg.statusCode = 409;\n    msg.payload = { error: \"El usuario ya fue registrado\" };\n    return [null, msg];\n}\n\nreturn msg;",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1200,
+        "y": 240,
+        "wires": [
+            [
+                "dc319014b8ba4b56"
+            ],
+            [
+                "302c189692ef1cb8"
+            ]
+        ]
+    },
+    {
+        "id": "302c189692ef1cb8",
+        "type": "http response",
+        "z": "f931bcdef6cf04d3",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 1390,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "5caee5f2366f9349",
+        "type": "debug",
+        "z": "f931bcdef6cf04d3",
+        "name": "debug 7",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1100,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "dc319014b8ba4b56",
+        "type": "sqlstring-format",
+        "z": "f931bcdef6cf04d3",
+        "name": "query insert nuevo usuario",
+        "query": "INSERT INTO usuarios(dni, nombre, password_hash)\nVALUES (?, ?, crypt(?, gen_salt('bf')))",
+        "vars": "dni, nombre, clave",
+        "outField": "query",
+        "x": 1440,
+        "y": 160,
+        "wires": [
+            [
+                "88968ab1c53e04be"
+            ]
+        ]
+    },
+    {
+        "id": "88968ab1c53e04be",
+        "type": "postgresql",
+        "z": "f931bcdef6cf04d3",
+        "name": "",
+        "query": "",
+        "postgreSQLConfig": "7886bb95aa94cc66",
+        "split": false,
+        "rowsPerMsg": 1,
+        "outputs": 1,
+        "x": 1610,
+        "y": 240,
+        "wires": [
+            [
+                "b4780ae0c76e27f6",
+                "77305f0f5fc32db8"
+            ]
+        ]
+    },
+    {
+        "id": "b4780ae0c76e27f6",
+        "type": "debug",
+        "z": "f931bcdef6cf04d3",
+        "name": "debug 8",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1800,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "77305f0f5fc32db8",
+        "type": "function",
+        "z": "f931bcdef6cf04d3",
+        "name": "Creador de respuesta",
+        "func": "const insertado = msg.pgsql.rowCount;\n\nif (insertado) {\n    msg.statusCode = 200;\n    msg.payload = {ok: true, estado: \"usuario registrado\"};\n} else {\n    msg.statusCode = 500;\n    msg.payload = { ok: false, estado: \"error de servidor\" };\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1860,
+        "y": 240,
+        "wires": [
+            [
+                "64dc9e4e6bced635"
+            ]
+        ]
+    },
+    {
+        "id": "64dc9e4e6bced635",
+        "type": "http response",
+        "z": "f931bcdef6cf04d3",
+        "name": "",
+        "statusCode": "",
+        "headers": {},
+        "x": 2090,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "7886bb95aa94cc66",
+        "type": "postgreSQLConfig",
+        "name": "BBDD Gym",
+        "host": "127.0.0.1",
+        "hostFieldType": "str",
+        "port": "5433",
+        "portFieldType": "num",
+        "database": "soa_gym",
+        "databaseFieldType": "str",
+        "ssl": "false",
+        "sslFieldType": "bool",
+        "applicationName": "",
+        "applicationNameType": "str",
+        "max": 10,
+        "maxFieldType": "num",
+        "idle": 1000,
+        "idleFieldType": "num",
+        "connectionTimeout": 10000,
+        "connectionTimeoutFieldType": "num",
+        "userFieldType": "cred",
+        "userEnv": "",
+        "passwordFieldType": "cred",
+        "passwordEnv": ""
+    },
+    {
+        "id": "542efc1786988cd3",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-sqlstring": "0.1.1",
+            "node-red-contrib-postgresql": "0.16.2"
+        }
+    }
+]

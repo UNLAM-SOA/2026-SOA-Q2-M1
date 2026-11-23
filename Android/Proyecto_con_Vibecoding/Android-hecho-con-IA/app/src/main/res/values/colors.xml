@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="gym_primary">#E65100</color>
+    <color name="gym_on_primary">#FFFFFF</color>
+    <color name="gym_secondary">#37474F</color>
+    <color name="gym_icon_bg">#263238</color>
+    <color name="ocupacion_baja">#2E7D32</color>
+    <color name="ocupacion_media">#F9A825</color>
+    <color name="ocupacion_alta">#C62828</color>
+</resources>

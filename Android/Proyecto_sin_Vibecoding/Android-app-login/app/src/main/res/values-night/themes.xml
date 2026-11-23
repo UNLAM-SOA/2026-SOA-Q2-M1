@@ -1,0 +1,4 @@
+<resources>
+    <!-- El tema es el mismo que en values/themes.xml (DayNight).
+         Los colores oscuros salen de values-night/colors.xml. -->
+</resources>

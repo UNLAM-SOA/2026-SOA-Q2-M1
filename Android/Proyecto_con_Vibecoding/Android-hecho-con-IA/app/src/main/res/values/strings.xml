@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GymPro</string>
+
+    <!-- Comunes -->
+    <string name="volver">Volver</string>
+    <string name="error_sin_conexion">Sin conexión a internet. Revisá tu red e intentá de nuevo.</string>
+    <string name="error_timeout">El servidor tardó demasiado en responder.</string>
+    <string name="error_desconocido">Ocurrió un error inesperado.</string>
+
+    <!-- Login -->
+    <string name="login_titulo">Iniciar sesión</string>
+    <string name="hint_dni">DNI</string>
+    <string name="hint_clave">Contraseña</string>
+    <string name="boton_ingresar">Ingresar</string>
+    <string name="link_registro">¿No tenés cuenta? Registrate</string>
+    <string name="error_dni_vacio">Ingresá tu DNI</string>
+    <string name="error_clave_vacia">Ingresá tu contraseña</string>
+    <string name="login_error_generico">No se pudo iniciar sesión</string>
+
+    <!-- Registro -->
+    <string name="registro_titulo">Crear cuenta</string>
+    <string name="hint_nombre">Nombre</string>
+    <string name="hint_apellido">Apellido</string>
+    <string name="hint_confirmar_clave">Confirmar contraseña</string>
+    <string name="boton_registrar">Registrarme</string>
+    <string name="error_campo_vacio">Este campo es obligatorio</string>
+    <string name="error_dni_numerico">El DNI debe contener solo números</string>
+    <string name="error_dni_largo">El DNI debe tener entre 7 y 9 dígitos</string>
+    <string name="error_clave_corta">La contraseña debe tener al menos 6 caracteres</string>
+    <string name="error_claves_distintas">Las contraseñas no coinciden</string>
+    <string name="registro_ok">Registro exitoso. Ya podés iniciar sesión.</string>
+    <string name="registro_dni_existente">Ese DNI ya está registrado</string>
+    <string name="registro_error_servidor">El servidor no pudo completar el registro</string>
+
+    <!-- Menú -->
+    <string name="menu_saludo">Hola, %1$s</string>
+    <string name="cuota_al_dia">Cuota al día</string>
+    <string name="cuota_vencida">Cuota vencida</string>
+    <string name="mqtt_conectando">Conectando…</string>
+    <string name="mqtt_conectado">Conectado</string>
+    <string name="mqtt_reconectando">Reconectando…</string>
+    <string name="mqtt_desconectado">Sin conexión</string>
+    <string name="mqtt_estado_formato">Conexión en tiempo real: %1$s</string>
+    <string name="menu_ocupacion">Ocupación del gimnasio</string>
+    <string name="menu_puerta">Abrir puerta</string>
+    <string name="menu_pagos">Historial de pagos</string>
+    <string name="menu_cerrar_sesion">Cerrar sesión</string>
+
+    <!-- Ocupación -->
+    <string name="ocupacion_titulo">Ocupación actual</string>
+    <string name="ocupacion_personas">personas en el gimnasio</string>
+    <string name="ocupacion_aforo">Aforo máximo: %1$d</string>
+    <string name="ocupacion_sin_datos">Esperando datos…</string>
+
+    <!-- Puerta -->
+    <string name="puerta_titulo">Abrir puerta</string>
+    <string name="puerta_boton">Abrir puerta</string>
+    <string name="puerta_enviado">Pedido de apertura enviado</string>
+    <string name="puerta_error">No se pudo enviar el pedido de apertura</string>
+    <string name="puerta_sin_cuota">Tu cuota está vencida: no podés abrir la puerta.</string>
+    <string name="puerta_sin_mqtt">Sin conexión en tiempo real: no se puede abrir.</string>
+    <string name="puerta_lista">Listo para abrir</string>
+
+    <!-- Pagos -->
+    <string name="pagos_titulo">Historial de pagos</string>
+    <string name="pagos_vacio">No hay pagos registrados</string>
+</resources>

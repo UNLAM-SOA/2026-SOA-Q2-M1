@@ -1,0 +1,197 @@
+[
+    {
+        "id": "c3d568ec7035ded3",
+        "type": "tab",
+        "label": "Flow Login app",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "83a031e032f60f24",
+        "type": "http in",
+        "z": "c3d568ec7035ded3",
+        "name": "API GET /login",
+        "url": "/login",
+        "method": "get",
+        "upload": false,
+        "skipBodyParsing": false,
+        "swaggerDoc": "",
+        "x": 220,
+        "y": 280,
+        "wires": [
+            [
+                "3bde4931b50c2e4b"
+            ]
+        ]
+    },
+    {
+        "id": "7f0f3980abe850b3",
+        "type": "http response",
+        "z": "c3d568ec7035ded3",
+        "name": "RESPONSE datos inválidos",
+        "statusCode": "400",
+        "headers": {},
+        "x": 760,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "f5065e3efb084394",
+        "type": "sqlstring-format",
+        "z": "c3d568ec7035ded3",
+        "name": "query datos user",
+        "query": "SELECT nombre, password_hash, activo\nFROM usuarios\nWHERE dni = ?;",
+        "vars": "dni",
+        "outField": "query",
+        "x": 710,
+        "y": 260,
+        "wires": [
+            [
+                "9b3d5a664124c9cf"
+            ]
+        ]
+    },
+    {
+        "id": "9b3d5a664124c9cf",
+        "type": "postgresql",
+        "z": "c3d568ec7035ded3",
+        "name": "",
+        "query": "",
+        "postgreSQLConfig": "7886bb95aa94cc66",
+        "split": false,
+        "rowsPerMsg": 1,
+        "outputs": 1,
+        "x": 910,
+        "y": 280,
+        "wires": [
+            [
+                "164e583148b68925",
+                "c87414e25a16dcf4"
+            ]
+        ]
+    },
+    {
+        "id": "164e583148b68925",
+        "type": "function",
+        "z": "c3d568ec7035ded3",
+        "name": "Validador clave",
+        "func": "const bcrypt = global.get('bcrypt');\nconst user = msg.payload[0];\n\nif (!user || !user.activo) {\n    msg.statusCode = 401;\n    msg.payload = { error: \"Credenciales incorrectas\" };\n    return msg;\n}\n\nconst ok = await bcrypt.compare(msg.clave, user.password_hash);\n\nif (!ok) {\n    msg.statusCode = 401;\n    msg.payload = { error: \"Credenciales incorrectas\" };\n    return msg;\n}\n\nmsg.statusCode = 200;\nmsg.payload = { ok: true, nombre: user.nombre, estado: user.activo};\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1100,
+        "y": 280,
+        "wires": [
+            [
+                "c767b1337f4e33bc",
+                "aa71d2376224ef20"
+            ]
+        ]
+    },
+    {
+        "id": "c767b1337f4e33bc",
+        "type": "http response",
+        "z": "c3d568ec7035ded3",
+        "name": "RESPONSE Login",
+        "statusCode": "",
+        "headers": {},
+        "x": 1330,
+        "y": 280,
+        "wires": []
+    },
+    {
+        "id": "3bde4931b50c2e4b",
+        "type": "function",
+        "z": "c3d568ec7035ded3",
+        "name": "Validador DNI",
+        "func": "const { dni, clave } = msg.req.query;\n\nif (!/^\\d{7,8}$/.test(dni) || typeof clave !== \"string\" || clave.length > 100) {\n    msg.statusCode = 400;\n    msg.payload = { error: \"Datos inválidos\" };\n    return [null, msg];\n}\n\nmsg.dni = dni;\nmsg.clave = clave;\nreturn [msg, null];",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 280,
+        "wires": [
+            [
+                "f5065e3efb084394"
+            ],
+            [
+                "7f0f3980abe850b3"
+            ]
+        ]
+    },
+    {
+        "id": "c87414e25a16dcf4",
+        "type": "debug",
+        "z": "c3d568ec7035ded3",
+        "name": "debug query bbdd",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1090,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "aa71d2376224ef20",
+        "type": "debug",
+        "z": "c3d568ec7035ded3",
+        "name": "debug clave",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1290,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "7886bb95aa94cc66",
+        "type": "postgreSQLConfig",
+        "name": "BBDD Gym",
+        "host": "127.0.0.1",
+        "hostFieldType": "str",
+        "port": "5433",
+        "portFieldType": "num",
+        "database": "soa_gym",
+        "databaseFieldType": "str",
+        "ssl": "false",
+        "sslFieldType": "bool",
+        "applicationName": "",
+        "applicationNameType": "str",
+        "max": 10,
+        "maxFieldType": "num",
+        "idle": 1000,
+        "idleFieldType": "num",
+        "connectionTimeout": 10000,
+        "connectionTimeoutFieldType": "num",
+        "userFieldType": "cred",
+        "userEnv": "",
+        "passwordFieldType": "cred",
+        "passwordEnv": ""
+    },
+    {
+        "id": "ed9ba426128c317d",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "node-red-contrib-sqlstring": "0.1.1",
+            "node-red-contrib-postgresql": "0.16.2"
+        }
+    }
+]
